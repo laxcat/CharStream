@@ -1,1 +1,134 @@
 # CharStream
+
+A C++17 character streaming class focussing on developer convenience. Uses stb_sprintf.h as core formatter.
+
+Very much NOT production ready or tested.
+
+## Features
+- Automatically creates a simple format string with set-once seperator and terminus strings
+- Can temporarily override seperator and terminus strings to write one-offs to same output or buffer
+- Can write direct to STD outputs or to string buffer
+- Works with basic types and any type that converts into a `char const *`
+- Optional convenience macro to further simplify using custom types
+
+## Examples
+---
+Set settings once for instance.
+```
+CharStream Log;
+Log(1.f, "two", 3);
+Log('4');
+```
+```
+1.00000 two 3
+4
+```
+---
+Customize output target and seperator/terminus strings with the constructor.
+```
+char _buff[512];
+CharStream Log{_buff, "::", "\n----------\n"};
+Log(1.f, "two", 3);
+Log('4');
+```
+Written to `_buff`:
+```
+1.00000::two::3
+----------
+4
+----------
+```
+---
+Works with custom types, any type that converts to `char const *`.
+```
+#include "CharStream.h"
+
+struct IntPair {
+    int a, b;
+    IntPair(int a, int b) : a(a), b(b) {}
+    operator char const * () {
+        stbsp_sprintf(_buff, "(%d, %d)", a, b);
+        return _buff;
+    }
+private:
+    char _buff[32];
+};
+
+int main() {
+    IntPair foo{56, 75};
+    IntPair bar{3, 4};
+
+    Log(foo, bar);
+
+    return 0;
+}
+```
+```
+(56, 75) (3, 4)
+```
+---
+Use `CHAR_STREAM_OPERATOR` macro to automatically construct custom type conversion operator.
+```
+#define CHAR_STREAM_OPERATOR_ENABLE
+#include "CharStream.h"
+
+struct IntPair {
+    int a, b;
+    IntPair(int a, int b) : a(a), b(b) {}
+    CHAR_STREAM_OPERATOR(32, 8, "(%d, %d)", a, b);
+};
+
+int main() {
+    IntPair foo{56, 75};
+    IntPair bar{3, 4};
+
+    Log(foo, bar);
+
+    return 0;
+}
+```
+```
+(56, 75) (3, 4)
+```
+
+## Requirements:
+`stb_sprintf.h` (https://github.com/nothings/stb/blob/master/stb_sprintf.h)  
+`<stdint.h>`  
+
+## API:
+
+*Constructor*  
+`target`: pointer to `char *` buffer or literal value keyword `STDIN`, `STDOUT` or `STDERR`  
+`sep`: seperator `char const *` that is written between each parameter in `()` call  
+`trm`: terminus `char const *` that is written after all parameters in `()` call  
+```
+CharStreamer(
+    char * target = CharStream::STDOUT,
+    char const * sep = " ",
+    char const * trm = "\n"
+);
+```
+
+*Function Call Operator ()*  
+Writes parameters out to `target`. `sep` is written between each parameter. `trm` is written at end.  
+Returns number of bytes written, not counting terminating null-byte.
+```
+template <typename ... TS>
+int operator () (TS && ...);
+```
+
+*Format*  
+Writes parameters out to `target`, with provided format string, thus instance `sep` and `trm` are ignored.  
+Returns number of bytes written, not counting terminating null-byte.  
+```
+template <typename ... TS>
+int format(char const * formatString, TS && ...);
+```
+
+*Write*  
+Writes parameters to target, ignoring instance `sep` and `trm`, using first parameter as seperator string for this call only.  
+Use the last parameter as a custom terminus string for this call only.  
+Returns number of bytes written, not counting terminating null-byte.  
+```
+template <typename ... TS>
+int write(char const * seperator, TS && ...);
