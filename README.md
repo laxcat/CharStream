@@ -110,7 +110,7 @@ Log(foo, bar);
 `target`: pointer to `char *` buffer or literal value keyword `STDIN`, `STDOUT` or `STDERR`  
 `sep`: seperator `char const *` that is written between each parameter in `()` call  
 `trm`: terminus `char const *` that is written after all parameters in `()` call  
-```
+```cpp
 CharStreamer(
     char * target = CharStream::STDOUT,
     char const * sep = " ",
@@ -121,7 +121,7 @@ CharStreamer(
 **Function Call Operator ()**  
 Writes parameters to `target`. `sep` is written between each parameter. `trm` is written at end.  
 Returns number of bytes written, not counting terminating null-byte.  
-```
+```cpp
 template <typename ... TS>
 int operator () (TS && ...);
 ```
@@ -129,7 +129,7 @@ int operator () (TS && ...);
 **Format**  
 Writes parameters to `target`, with provided `formatString`, thus instance `sep` and `trm` are ignored.  
 Returns number of bytes written, not counting terminating null-byte.  
-```
+```cpp
 template <typename ... TS>
 int format(char const * formatString, TS && ...);
 ```
@@ -137,6 +137,7 @@ int format(char const * formatString, TS && ...);
 **Write**  
 Writes parameters to target, ignoring instance `sep` and `trm`, using `seperator` for this call only.  
 Returns number of bytes written, not counting terminating null-byte.  
-```
+```cpp
 template <typename ... TS>
 int write(char const * seperator, TS && ...);
+```
