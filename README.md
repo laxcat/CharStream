@@ -12,9 +12,8 @@ Very much NOT production ready or tested.
 - Optional convenience macro to further simplify using custom types
 
 ## Examples
----
 Set settings once for instance.
-```
+```cpp
 CharStream Log;
 Log(1.f, "two", 3);
 Log('4');
@@ -23,9 +22,22 @@ Log('4');
 1.00000 two 3
 4
 ```
----
-Customize output target and seperator/terminus strings with the constructor.
+<br>
+
+Set seperator and terminus strings once for the instance.
+```cpp
+CharStream Log{CharStream::STDOUT, ", ", "!\n"};
+Log(1.f, "two", 3);
+Log('4');
 ```
+```bash
+1.00000, two, 3!
+4!
+```
+<br>
+
+Customize output target and seperator/terminus strings with the constructor.
+```cpp
 char _buff[512];
 CharStream Log{_buff, "::", "\n----------\n"};
 Log(1.f, "two", 3);
@@ -38,9 +50,10 @@ Written to `_buff`:
 4
 ----------
 ```
----
+<br>
+
 Works with custom types, any type that converts to `char const *`.
-```
+```cpp
 #include "CharStream.h"
 
 struct IntPair {
@@ -54,42 +67,38 @@ private:
     char _buff[32];
 };
 
-int main() {
-    IntPair foo{56, 75};
-    IntPair bar{3, 4};
+IntPair foo{56, 75};
+IntPair bar{3, 4};
 
-    Log(foo, bar);
-
-    return 0;
-}
+CharStream Log;
+Log(foo, bar);
 ```
 ```
 (56, 75) (3, 4)
 ```
----
+<br>
+
 Use `CHAR_STREAM_OPERATOR` macro to automatically construct custom type conversion operator.
-```
+```cpp
 #define CHAR_STREAM_OPERATOR_ENABLE
 #include "CharStream.h"
 
 struct IntPair {
     int a, b;
     IntPair(int a, int b) : a(a), b(b) {}
-    CHAR_STREAM_OPERATOR(32, 8, "(%d, %d)", a, b);
+    CHAR_STREAM_OPERATOR(32, 8, "(%d, %d)", a, b)
 };
 
-int main() {
-    IntPair foo{56, 75};
-    IntPair bar{3, 4};
+IntPair foo{56, 75};
+IntPair bar{3, 4};
 
-    Log(foo, bar);
-
-    return 0;
-}
+CharStream Log;
+Log(foo, bar);
 ```
 ```
 (56, 75) (3, 4)
 ```
+<br>
 
 ## Requirements:
 `stb_sprintf.h` (https://github.com/nothings/stb/blob/master/stb_sprintf.h)  
@@ -97,7 +106,7 @@ int main() {
 
 ## API:
 
-*Constructor*  
+**Constructor**  
 `target`: pointer to `char *` buffer or literal value keyword `STDIN`, `STDOUT` or `STDERR`  
 `sep`: seperator `char const *` that is written between each parameter in `()` call  
 `trm`: terminus `char const *` that is written after all parameters in `()` call  
@@ -109,25 +118,24 @@ CharStreamer(
 );
 ```
 
-*Function Call Operator ()*  
-Writes parameters out to `target`. `sep` is written between each parameter. `trm` is written at end.  
-Returns number of bytes written, not counting terminating null-byte.
+**Function Call Operator ()**  
+Writes parameters to `target`. `sep` is written between each parameter. `trm` is written at end.  
+Returns number of bytes written, not counting terminating null-byte.  
 ```
 template <typename ... TS>
 int operator () (TS && ...);
 ```
 
-*Format*  
-Writes parameters out to `target`, with provided format string, thus instance `sep` and `trm` are ignored.  
+**Format**  
+Writes parameters to `target`, with provided `formatString`, thus instance `sep` and `trm` are ignored.  
 Returns number of bytes written, not counting terminating null-byte.  
 ```
 template <typename ... TS>
 int format(char const * formatString, TS && ...);
 ```
 
-*Write*  
-Writes parameters to target, ignoring instance `sep` and `trm`, using first parameter as seperator string for this call only.  
-Use the last parameter as a custom terminus string for this call only.  
+**Write**  
+Writes parameters to target, ignoring instance `sep` and `trm`, using `seperator` for this call only.  
 Returns number of bytes written, not counting terminating null-byte.  
 ```
 template <typename ... TS>
