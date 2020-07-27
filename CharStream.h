@@ -11,17 +11,27 @@ For documentation refer to README.md in this directory or https://github.com/lax
 #include <stdint.h>
 
 
-#ifdef _WIN32
 // WINDOWS (untested)
-#include <io.h>
-#define stdwrite(TARGET, BUF, COUNT) ::_write(TARGET, BUF, COUNT)
-#else
+#ifdef _WIN32
+    #include <io.h>
+    #define stdwrite(TARGET, BUF, COUNT) ::_write(TARGET, BUF, COUNT)
 // MAC-OS (and other *nix platforms, untested)
-#include <unistd.h>
-#define stdwrite(TARGET, BUF, COUNT) ::write(TARGET, BUF, COUNT)
-#define stdin STDIN_FILENO
-#define stderr STDERR_FILENO
-#define stdout STDOUT_FILENO
+#else
+    #include <unistd.h>
+    #define stdwrite(TARGET, BUF, COUNT) ::write(TARGET, BUF, COUNT)
+
+    #ifndef stdin
+    #define stdin STDIN_FILENO
+    #endif
+
+    #ifndef stderr
+    #define stderr STDERR_FILENO
+    #endif
+
+    #ifndef stdout
+    #define stdout STDOUT_FILENO
+    #endif
+
 #endif
 
 
@@ -52,6 +62,7 @@ public:
         size_t value;
         Target(size_t value) : value(value) {}
         Target(char * str) : str(str) {}
+        template <typename T> Target(T * value) : value((size_t)((void *)value)) {}
         template <size_t N> Target(char (&str)[N]) : str((char *)str) {}
     };
 
