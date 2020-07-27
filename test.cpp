@@ -9,13 +9,50 @@ struct IntPair {
 };
 
 
+
+
 int main() {
     CharStream Log;
+
+
+    // Standard types
+    Log("Standard types:\n----------------");
+
+    auto a = -4300000000;
+    auto b = 4300000000;
+    auto c = 'c';
+    int8_t d = c;
+    char e = d;
+    Log(a, b, true, false, c, d, e, -4400000000);
+    Log();
+
+
+    // Custom types
+    Log("Custom types:\n----------------");
 
     IntPair foo{56, 75};
     IntPair bar{3, 4};
 
     Log(foo, bar);
+    Log();
+
+
+    // Write function
+    Log("Write function:\n----------------");
+
+    Log.write("___", 1, 2, 3, "\n");
+    CharStream SameSame{stdout, "___", "\n"};
+    SameSame(1, 2, 3);
+    Log(1, 2, 3);
+    Log();
+
+
+    // Format function
+    Log("Format function\n----------------");
+
+    Log.format("(%d%d%d)\n", 1, 2, 3);
+    Log(1, 2, 3);
+    Log();
 
     return 0;
 }
