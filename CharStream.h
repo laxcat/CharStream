@@ -1,3 +1,11 @@
+/*
+
+CharStream
+https://github.com/laxcat/CharStream/
+For documentation refer to README.md in this directory or https://github.com/laxcat/CharStream/blob/master/README.md
+
+*/
+
 #pragma once
 #include "stb_sprintf.h"
 #include <stdint.h>
