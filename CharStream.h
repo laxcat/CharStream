@@ -45,28 +45,30 @@ public:
         template <size_t N> Target(char (&str)[N]) : str((char *)str) {}
     };
 
-// Constructor
-public:
-
-    CharStream(Target target = stdout, char const * sep = " ", char const * trm = "\n") : _target(target), _sep(sep), _trm(trm) {}
 
 // Instance API
 public:
 
-    // Callop ().
+    // Constructor
+    CharStream(Target target = stdout, char const * sep = " ", char const * trm = "\n") : 
+        _target(target), 
+        _sep(sep), 
+        _trm(trm) {}
+
+    // Callop ()
     template <typename ... TS>
     int operator () (TS && ... params) {
         writeFormat(_sep, _trm, static_cast<TS &&>(params)...);
         return buffsprintf(_formatBuff, coerceToExpectedParam(static_cast<TS &&>(params))...);
     }
 
-    // Format.
+    // Format
     template <typename ... TS>
     int format(char const * fmt, TS && ... params) {
         return buffsprintf(fmt, coerceToExpectedParam(static_cast<TS &&>(params))...);
     }
 
-    // Write.
+    // Write
     template <typename ... TS>
     int write(char const * sep, TS && ... params) {
         writeFormat(sep, "", static_cast<TS &&>(params)...);
@@ -148,6 +150,9 @@ private:
     char * callbackTargetStr() const  {
         return _target.str + _callbackBuffIndex;
     }
+
+// Private static utilities
+private:
 
     static size_t scpy(char * dst, char const * src, size_t max = -1) {
         size_t i = 0;
