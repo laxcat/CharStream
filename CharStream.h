@@ -77,6 +77,9 @@ public:
         _trm(trm) {}
 
     // Callop ()
+    int operator () () {
+        return buffsprintf("%s", _trm);
+    }
     template <typename ... TS>
     int operator () (TS && ... params) {
         writeFormat(_sep, _trm, sizeof...(params), static_cast<TS &&>(params)...);
