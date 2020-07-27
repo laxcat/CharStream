@@ -81,19 +81,6 @@ public:
 // Private utilities
 private:
 
-           float coerceToExpectedParam(       float t) { return t; }
-          double coerceToExpectedParam(      double t) { return t; }
-    char const * coerceToExpectedParam(        bool t) { return t ? StringTrue : StringFalse; }
-         uint8_t coerceToExpectedParam(     uint8_t t) { return t; }
-        uint16_t coerceToExpectedParam(    uint16_t t) { return t; }
-        uint32_t coerceToExpectedParam(    uint32_t t) { return t; }
-        uint64_t coerceToExpectedParam(    uint64_t t) { return t; }
-          int8_t coerceToExpectedParam(      int8_t t) { return t; }
-         int16_t coerceToExpectedParam(     int16_t t) { return t; }
-         int32_t coerceToExpectedParam(     int32_t t) { return t; }
-         int64_t coerceToExpectedParam(     int64_t t) { return t; }
-    char const * coerceToExpectedParam(char const * t) { return t; }
-
     template <typename ... TS>
     void writeFormat(char const * sep, char const * trm, FI paramCount, TS && ... params) {
         FI fbuffIndex = 0;
@@ -128,19 +115,23 @@ private:
 
         ++paramIndex;
     }
-    
-    char charForType(       float) { return 'f'; }
-    char charForType(      double) { return 'f'; }
-    char charForType(        bool) { return 's'; }
-    char charForType(     uint8_t) { return 'd'; }
-    char charForType(    uint16_t) { return 'd'; }
-    char charForType(    uint32_t) { return 'd'; }
-    char charForType(    uint64_t) { return 'd'; }
-    char charForType(      int8_t) { return 'd'; }
-    char charForType(     int16_t) { return 'd'; }
-    char charForType(     int32_t) { return 'd'; }
-    char charForType(     int64_t) { return 'd'; }
-    char charForType(char const *) { return 's'; }
+
+    #define EXPECTED_TYPE(EXPECTED_TYPE, VALUE, VALUE_RETURN, FORMAT_CHAR) \
+    auto coerceToExpectedParam(EXPECTED_TYPE VALUE) { return VALUE_RETURN; } \
+    char charForType(EXPECTED_TYPE) { return FORMAT_CHAR; }
+    //
+    EXPECTED_TYPE(       float, t,                            t, 'f')
+    EXPECTED_TYPE(      double, t,                            t, 'f')
+    EXPECTED_TYPE(        bool, t, t ? StringTrue : StringFalse, 's')
+    EXPECTED_TYPE(     uint8_t, t,                            t, 'd')
+    EXPECTED_TYPE(    uint16_t, t,                            t, 'd')
+    EXPECTED_TYPE(    uint32_t, t,                            t, 'd')
+    EXPECTED_TYPE(    uint64_t, t,                            t, 'd')
+    EXPECTED_TYPE(      int8_t, t,                            t, 'd')
+    EXPECTED_TYPE(     int16_t, t,                            t, 'd')
+    EXPECTED_TYPE(     int32_t, t,                            t, 'd')
+    EXPECTED_TYPE(     int64_t, t,                            t, 'd')
+    EXPECTED_TYPE(char const *, t,                            t, 's')
 
     int buffsprintf(char const *fmt, ...) {
         _callbackBuffIndex = 0;
