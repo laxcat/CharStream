@@ -35,7 +35,10 @@ private:
 // Public declarations
 public:
 
-    static constexpr FI FORMAT_BUFFER_SIZE = 255;
+    static constexpr char const * StringTrue = "true";
+    static constexpr char const * StringFalse = "false";
+
+    static constexpr FI FormatBufferSize = 255;
 
     union Target {
         char * str;
@@ -80,6 +83,7 @@ private:
 
            float coerceToExpectedParam(       float t) { return t; }
           double coerceToExpectedParam(      double t) { return t; }
+    char const * coerceToExpectedParam(        bool t) { return t ? StringTrue : StringFalse; }
          uint8_t coerceToExpectedParam(     uint8_t t) { return t; }
         uint16_t coerceToExpectedParam(    uint16_t t) { return t; }
         uint32_t coerceToExpectedParam(    uint32_t t) { return t; }
@@ -124,8 +128,10 @@ private:
 
         ++paramIndex;
     }
+    
     char charForType(       float) { return 'f'; }
     char charForType(      double) { return 'f'; }
+    char charForType(        bool) { return 's'; }
     char charForType(     uint8_t) { return 'd'; }
     char charForType(    uint16_t) { return 'd'; }
     char charForType(    uint32_t) { return 'd'; }
@@ -193,7 +199,7 @@ private:
     char const * _trm;
     size_t _callbackBuffIndex;
     char _buff[STB_SPRINTF_MIN];
-    char _formatBuff[FORMAT_BUFFER_SIZE];
+    char _formatBuff[FormatBufferSize];
 
 };
 
