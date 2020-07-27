@@ -37,6 +37,13 @@ public:
 
     static constexpr char const * StringTrue = "true";
     static constexpr char const * StringFalse = "false";
+    static constexpr char const * StringFmtFloat = "f";
+    static constexpr char const * StringFmtString = "s";
+    static constexpr char const * StringFmtChar = "c";
+    static constexpr char const * StringFmtUint = "d";
+    static constexpr char const * StringFmtUintLong = "ld";
+    static constexpr char const * StringFmtInt = "d";
+    static constexpr char const * StringFmtIntLong = "ld";
 
     static constexpr FI FormatBufferSize = 255;
 
@@ -98,9 +105,8 @@ private:
         TS && param) {
 
         // write the format string
-        _formatBuff[fbuffIndex + 0] =  '%';
-        _formatBuff[fbuffIndex + 1] =  charForType(param);
-        fbuffIndex += 2;
+        fbuffIndex += scpy(_formatBuff + fbuffIndex, "%", 1);
+        fbuffIndex += scpy(_formatBuff + fbuffIndex, charForType(param));
 
         // seperator or terminator string?
         // can also be blank if past defined parameter count, which
@@ -116,22 +122,25 @@ private:
         ++paramIndex;
     }
 
-    #define EXPECTED_TYPE(EXPECTED_TYPE, VALUE, VALUE_RETURN, FORMAT_CHAR) \
-    auto coerceToExpectedParam(EXPECTED_TYPE VALUE) { return VALUE_RETURN; } \
-    char charForType(EXPECTED_TYPE) { return FORMAT_CHAR; }
+    #define EXPECTED_TYPE(EXPECTED_TYPE, VALUE, RETURN_VALUE, FORMAT_CHAR) \
+    auto coerceToExpectedParam(EXPECTED_TYPE const & VALUE) { return RETURN_VALUE; } \
+    char const * charForType(EXPECTED_TYPE) { return FORMAT_CHAR; }
     //
-    EXPECTED_TYPE(       float, t,                            t, 'f')
-    EXPECTED_TYPE(      double, t,                            t, 'f')
-    EXPECTED_TYPE(        bool, t, t ? StringTrue : StringFalse, 's')
-    EXPECTED_TYPE(     uint8_t, t,                            t, 'd')
-    EXPECTED_TYPE(    uint16_t, t,                            t, 'd')
-    EXPECTED_TYPE(    uint32_t, t,                            t, 'd')
-    EXPECTED_TYPE(    uint64_t, t,                            t, 'd')
-    EXPECTED_TYPE(      int8_t, t,                            t, 'd')
-    EXPECTED_TYPE(     int16_t, t,                            t, 'd')
-    EXPECTED_TYPE(     int32_t, t,                            t, 'd')
-    EXPECTED_TYPE(     int64_t, t,                            t, 'd')
-    EXPECTED_TYPE(char const *, t,                            t, 's')
+    EXPECTED_TYPE(             float, t,                            t, StringFmtFloat)
+    EXPECTED_TYPE(            double, t,                            t, StringFmtFloat)
+    EXPECTED_TYPE(              bool, t, t ? StringTrue : StringFalse, StringFmtString)
+    EXPECTED_TYPE(              char, t,                            t, StringFmtChar)
+    EXPECTED_TYPE(           uint8_t, t,                            t, StringFmtUint)
+    EXPECTED_TYPE(          uint16_t, t,                            t, StringFmtUint)
+    EXPECTED_TYPE(          uint32_t, t,                            t, StringFmtUint)
+    EXPECTED_TYPE(     unsigned long, t,                            t, StringFmtUintLong)
+    EXPECTED_TYPE(          uint64_t, t,                            t, StringFmtUintLong)
+    EXPECTED_TYPE(            int8_t, t,                            t, StringFmtInt)
+    EXPECTED_TYPE(           int16_t, t,                            t, StringFmtInt)
+    EXPECTED_TYPE(           int32_t, t,                            t, StringFmtInt)
+    EXPECTED_TYPE(              long, t,                            t, StringFmtIntLong)
+    EXPECTED_TYPE(           int64_t, t,                            t, StringFmtIntLong)
+    EXPECTED_TYPE(      char const *, t,                            t, StringFmtString)
 
     int buffsprintf(char const *fmt, ...) {
         _callbackBuffIndex = 0;
