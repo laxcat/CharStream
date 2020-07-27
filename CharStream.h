@@ -177,7 +177,7 @@ private:
 };
 
 
-#ifdef CHAR_STREAM_OPERATOR_ENABLE
+#ifdef CHAR_STREAM_ENABLE_OPERATOR_MACRO
 
 template <typename ST, ST N>
 class CharLoop {

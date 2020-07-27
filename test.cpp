@@ -1,4 +1,4 @@
-#define CHAR_STREAM_OPERATOR_ENABLE
+#define CHAR_STREAM_ENABLE_OPERATOR_MACRO
 #include "CharStream.h"
 
 
