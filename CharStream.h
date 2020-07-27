@@ -59,11 +59,12 @@ public:
 
     union Target {
         char * str;
+        void * ptr;
         size_t value;
         Target(size_t value) : value(value) {}
         Target(char * str) : str(str) {}
-        template <typename T> Target(T * value) : value((size_t)((void *)value)) {}
         template <size_t N> Target(char (&str)[N]) : str((char *)str) {}
+        template <typename T> Target(T * value) : ptr((void *)value) {}
     };
 
 
