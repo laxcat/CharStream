@@ -19,11 +19,14 @@ For documentation refer to README.md in this directory or https://github.com/lax
 // MAC-OS (and other *nix platforms, untested)
 #include <unistd.h>
 #define stdwrite(TARGET, BUF, COUNT) ::write(TARGET, BUF, COUNT)
+#define stdin STDIN_FILENO
+#define stderr STDERR_FILENO
+#define stdout STDOUT_FILENO
 #endif
 
 
 class CharStream {
-// Private declarations
+// Private convenience declarations
 private:
 
     using FI = uint8_t;
@@ -33,9 +36,6 @@ private:
 public:
 
     static constexpr FI FORMAT_BUFFER_SIZE = 255;
-    static constexpr size_t STDIN  = 0;
-    static constexpr size_t STDOUT = 1;
-    static constexpr size_t STDERR = 2;
 
     union Target {
         char * str;
@@ -48,7 +48,7 @@ public:
 // Constructor
 public:
 
-    CharStream(Target target = STDOUT, char const * sep = " ", char const * trm = "\n") : _target(target), _sep(sep), _trm(trm) {}
+    CharStream(Target target = stdout, char const * sep = " ", char const * trm = "\n") : _target(target), _sep(sep), _trm(trm) {}
 
 // Instance API
 public:
@@ -139,9 +139,9 @@ private:
     bool isTargetStd() const {
         size_t t = _target.value;
         return (
-            t == STDOUT ||
-            t == STDIN  ||
-            t == STDERR
+            t == stdout ||
+            t == stdin  ||
+            t == stderr
         );
     }
 
