@@ -58,7 +58,7 @@ public:
     // Callop ()
     template <typename ... TS>
     int operator () (TS && ... params) {
-        writeFormat(_sep, _trm, static_cast<TS &&>(params)...);
+        writeFormat(_sep, _trm, sizeof...(params), static_cast<TS &&>(params)...);
         return buffsprintf(_formatBuff, coerceToExpectedParam(static_cast<TS &&>(params))...);
     }
 
@@ -71,7 +71,7 @@ public:
     // Write
     template <typename ... TS>
     int write(char const * sep, TS && ... params) {
-        writeFormat(sep, "", static_cast<TS &&>(params)...);
+        writeFormat(sep, "", sizeof...(params) - 1, static_cast<TS &&>(params)...);
         return buffsprintf(_formatBuff, coerceToExpectedParam(static_cast<TS &&>(params))...);
     }
 
@@ -91,30 +91,38 @@ private:
     char const * coerceToExpectedParam(char const * t) { return t; }
 
     template <typename ... TS>
-    void writeFormat(char const * sep, char const * trm, TS && ... params) {
-        // i = char index, j = param index, t = param count
-        FI i = 0, j = 0;
-        static constexpr FI t = sizeof...(params);
-
-        // call the fn for each param:
-        //  format string buffer index "i" gets modified for each call.
-        //  sep or trm is sent based on param-index "j", incremented each call.
-        (writeFormatItem(params, i, (++j < t) ? sep : trm), ...);
-
-        _formatBuff[i] = '\0';
-
-
-        // printf("?%s?%d", _formatBuff, (int)strlen(_formatBuff));
+    void writeFormat(char const * sep, char const * trm, FI paramCount, TS && ... params) {
+        FI fbuffIndex = 0;
+        FI paramIndex = 0;
+        (writeFormatItem(sep, trm, fbuffIndex, paramIndex, paramCount, params), ...);
     }
 
     template <typename TS>
-    void writeFormatItem(TS && param, FI & i, char const * sepOrTrm) {
+    void writeFormatItem(
+        char const * sep, 
+        char const * trm, 
+        FI & fbuffIndex,
+        FI & paramIndex,
+        FI paramCount,
+        TS && param) {
+
         // write the format string
-        _formatBuff[i + 0] =  '%';
-        _formatBuff[i + 1] =  charForType(param);
-        i += 2;
+        _formatBuff[fbuffIndex + 0] =  '%';
+        _formatBuff[fbuffIndex + 1] =  charForType(param);
+        fbuffIndex += 2;
+
+        // seperator or terminator string?
+        // can also be blank if past defined parameter count, which
+        // can be artificially constrained
+        char const * sepOrTrm = 
+            (paramIndex <  paramCount-1) ? sep :
+            (paramIndex == paramCount-1) ? trm :
+            "";
+
         // write a spacer or terminus string
-        i += scpy(_formatBuff + i, sepOrTrm);
+        fbuffIndex += scpy(_formatBuff + fbuffIndex, sepOrTrm);
+
+        ++paramIndex;
     }
     char charForType(       float) { return 'f'; }
     char charForType(      double) { return 'f'; }
