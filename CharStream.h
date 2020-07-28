@@ -14,11 +14,12 @@ For documentation refer to README.md in this directory or https://github.com/lax
 // WINDOWS (untested)
 #ifdef _WIN32
     #include <io.h>
-    #define stdwrite(TARGET, BUF, COUNT) ::_write(TARGET, BUF, COUNT)
+    #define stdwrite(DST, SRC, LEN) ::_write(DST, SRC, LEN)
+
 // MAC-OS (and other *nix platforms, untested)
 #else
     #include <unistd.h>
-    #define stdwrite(TARGET, BUF, COUNT) ::write(TARGET, BUF, COUNT)
+    #define stdwrite(DST, SRC, LEN) ::write(DST, SRC, LEN)
 
     #ifndef stdin
     #define stdin STDIN_FILENO
@@ -45,15 +46,15 @@ private:
 // Public declarations
 public:
 
-    static constexpr char const * StringTrue = "true";
-    static constexpr char const * StringFalse = "false";
-    static constexpr char const * StringFmtFloat = "f";
-    static constexpr char const * StringFmtString = "s";
-    static constexpr char const * StringFmtChar = "c";
-    static constexpr char const * StringFmtUint = "d";
-    static constexpr char const * StringFmtUintLong = "ld";
-    static constexpr char const * StringFmtInt = "d";
-    static constexpr char const * StringFmtIntLong = "ld";
+    static constexpr char const * StringTrue            = "true";
+    static constexpr char const * StringFalse           = "false";
+    static constexpr char const * StringFmtFloat        = "f";
+    static constexpr char const * StringFmtString       = "s";
+    static constexpr char const * StringFmtChar         = "c";
+    static constexpr char const * StringFmtUint         = "d";
+    static constexpr char const * StringFmtUintLong     = "ld";
+    static constexpr char const * StringFmtInt          = "d";
+    static constexpr char const * StringFmtIntLong      = "ld";
 
     static constexpr FI FormatBufferSize = 255;
 
@@ -183,7 +184,7 @@ private:
 // Private static utilities
 private:
 
-    static size_t scpy(char * dst, char const * src, size_t max = -1) {
+    static size_t scpy(char * dst, char const * src, size_t max = (size_t)-1) {
         size_t i = 0;
         for(; i < max; ++i) {
             dst[i] = src[i];
