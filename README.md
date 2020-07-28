@@ -1,8 +1,8 @@
 # CharStream
 
-A C++17 character streaming class focussing on developer convenience. Specifically an attempt to create a simple-to-use log function (string conversion function) that accepts and automatically formats any number of parameters of any type, similar to swift's `print` or JavaScript's `console.log`. Uses stb_sprintf.h as core formatter.
+A C++17 char streaming class focussing on developer convenience. Specifically an attempt to create a simple-to-use print/log/string-conversion function that accepts and automatically formats any number of parameters of any type, similar to swift's `print` or JavaScript's `console.log`. Uses stb_sprintf.h as core formatter.
 
-Includes simple test with an example, with a simple `buildtest` script of a single command only tested on macOS. Nothing here is tested beyond that. Nothing here is production ready.
+Includes a simple `buildtest` script (single clang++ command), tested in macOS, that demonstrates the basic functionality. Not tested beyond that, so not production ready.
 
 
 
@@ -134,7 +134,7 @@ Ouput to `stdout`:
 `target` accepts a `char *`, `FILE *`, `size_t` (and others) reference to an output or string buffer. For each call operator call, `sep` is written between each parameter and `trm` is written after the last one.
 
 ```cpp
-CharStreamer(
+CharStream(
     CharStream::Target target = stdout,
     char const * sep = " ",
     char const * trm = "\n"
@@ -167,7 +167,7 @@ int format(char const * formatString, TS && ...);
 
 **Write** 
 
-Writes parameters to target, ignoring instance `sep` and `trm`, using `seperator` for this call only. Assumes last parameter to be terminus string, used . Returns number of bytes written, not counting terminating null-byte.
+Writes parameters to target, ignoring instance `sep` and `trm`, using `seperator` for this call only. Assumes last parameter to be terminus string, and will not write a `sep` string preceeding it. Returns number of bytes written, not counting terminating null-byte.
 
 ```cpp
 template <typename ... TS>
@@ -178,7 +178,7 @@ int write(char const * seperator, TS && ...);
 
 **CHAR_STREAM_OPERATOR**
 
-Macro function for conveniently adding a `char const *` operator to a custom class. `SIZE` is the number of characters needed for each instance's output. `COUNT` is number of this custom-type instances that can be included as parameters of any one given call. `FORMAT` and the variadic parameters are used to construct the string.
+Macro function for conveniently adding a `char const *` operator to a custom class. `SIZE` is the number of characters needed for each instance's constructed output. `COUNT` is number instances of this custom-type that can be included as parameters of any one given call. (Each custom type using this macro will allocate a `SIZE * COUNT` byte char buffer for all instances to share.) `FORMAT` and the variadic parameters are used to construct the string.
 
 ```cpp
 CHAR_STREAM_OPERATOR(SIZE, COUNT, FORMAT, ...)
