@@ -36,7 +36,7 @@ Output to `stdout` (default):
 Set ouput target, seperator, and terminus strings once for the instance.
 
 ```cpp
-CharStream Log{CharStream::STDOUT, ", ", "!\n"};
+CharStream Log{stdout, ", ", "!\n"};
 Log(1.f, "two", 3);
 Log('4');
 ```
