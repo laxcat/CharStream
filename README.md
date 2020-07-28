@@ -2,7 +2,7 @@
 
 A C++17 character streaming class focussing on developer convenience. Specifically an attempt to create a simple-to-use log function (string conversion function) that accepts and automatically formats any number of parameters of any type, similar to swift's `print` or JavaScript's `console.log`. Uses stb_sprintf.h as core formatter.
 
-Includes simple test with an example, with a simple `build` script of a single command only tested on macOS. Nothing here is tested beyond that. Nothing here is production ready, but as it .
+Includes simple test with an example, with a simple `build` script of a single command only tested on macOS. Nothing here is tested beyond that. Nothing here is production ready.
 
 
 
