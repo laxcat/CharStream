@@ -2,7 +2,7 @@
 
 A C++17 character streaming class focussing on developer convenience. Specifically an attempt to create a simple-to-use log function (string conversion function) that accepts and automatically formats any number of parameters of any type, similar to swift's `print` or JavaScript's `console.log`. Uses stb_sprintf.h as core formatter.
 
-Includes simple test with an example, with a simple `build` script of a single command only tested on macOS. Nothing here is tested beyond that. Nothing here is production ready.
+Includes simple test with an example, with a simple `buildtest` script of a single command only tested on macOS. Nothing here is tested beyond that. Nothing here is production ready.
 
 
 
@@ -121,10 +121,10 @@ Ouput to `stdout`:
 
 
 ## Requirements
-[stb_sprintf.h]: https://github.com/nothings/stb/blob/master/stb_sprintf.h
-[<stdint.h>]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdint.h.html
-[<unistd.h>]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/unistd.h.html "(macOS, *nix)"
-[<io.h>]: https://docs.microsoft.com/en-us/cpp/c-runtime-library/low-level-i-o "(Windows)"
+- [stb_sprintf.h]: https://github.com/nothings/stb/blob/master/stb_sprintf.h
+- [<stdint.h>]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdint.h.html
+- [<unistd.h>]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/unistd.h.html "(macOS, *nix)"
+- [<io.h>]: https://docs.microsoft.com/en-us/cpp/c-runtime-library/low-level-i-o "(Windows)"
 
 
 
