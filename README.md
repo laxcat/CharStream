@@ -1,6 +1,6 @@
 # CharStream
 
-A C++17 char streaming class focussing on developer convenience. Specifically an attempt to create a simple-to-use print/log/string-conversion function that accepts and automatically formats any number of parameters of any type, similar to swift's `print` or JavaScript's `console.log`. Uses stb_sprintf.h as core formatter.
+A C++17 char streaming class focussing on developer convenience. Specifically an attempt to create a simple-to-use print/log/string-conversion function that accepts and automatically formats any number of parameters of any type, similar to swift's `print` or JavaScript's `console.log`. Uses a user-defined  `sprintf` function as its core formatter.
 
 Includes a simple `buildtest` script (single clang++ command), tested in macOS, that demonstrates the basic functionality. Not tested beyond that, so not production ready.
 
@@ -122,9 +122,9 @@ Ouput to `stdout`:
 
 ## Requirements
 
-- [`stb_sprintf.h`](https://github.com/nothings/stb/blob/master/stb_sprintf.h)
+- Any `sprintf` function with a standard interface
 - [`<stdint.h>`](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdint.h.html)
-- [`<unistd.h>` (macOS, *nix)](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/unistd.h.html) or [`<io.h>` (Windows)](https://docs.microsoft.com/en-us/cpp/c-runtime-library/low-level-i-o)
+- If writting out to standard output [`<unistd.h>` (macOS, *nix)](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/unistd.h.html) or [`<io.h>` (Windows)](https://docs.microsoft.com/en-us/cpp/c-runtime-library/low-level-i-o)
 
 
 
@@ -183,3 +183,15 @@ Macro function for conveniently adding a `char const *` operator to a custom cla
 ```cpp
 CHAR_STREAM_OPERATOR(SIZE, COUNT, FORMAT, ...)
 ```
+
+
+
+**CHAR_STREAM_BUFFER_SIZE**
+
+Size of internal buffer when writting to a standard output. Not read when writing directly to string buffer. Default 128.
+
+
+
+**CHAR_STREAM_SPRINTF**
+
+Name of `sprintf` function to use. Default `sprintf`.

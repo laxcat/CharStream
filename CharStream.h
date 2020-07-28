@@ -7,8 +7,16 @@ For documentation refer to README.md in this directory or https://github.com/lax
 */
 
 #pragma once
-#include "stb_sprintf.h"
 #include <stdint.h>
+
+#ifndef CHAR_STREAM_BUFFER_SIZE
+#define CHAR_STREAM_BUFFER_SIZE 512
+#endif
+
+#ifndef CHAR_STREAM_SPRINTF
+#define CHAR_STREAM_SPRINTF sprintf
+#endif
+
 
 
 // WINDOWS (untested)
@@ -75,30 +83,31 @@ public:
     // Constructor
     CharStream(Target target = stdout, char const * sep = " ", char const * trm = "\n") : 
         _target(target), 
+        _targetIsSTD(_target.value == stdin || _target.value == stderr || _target.value == stdout), 
         _sep(sep), 
         _trm(trm) {}
 
     // Callop ()
     int operator () () {
-        return buffsprintf("%s", _trm);
+        return targetSprintf("%s", _trm);
     }
     template <typename ... TS>
     int operator () (TS && ... params) {
         writeFormat(_sep, _trm, sizeof...(params), static_cast<TS &&>(params)...);
-        return buffsprintf(_formatBuff, coerceToExpectedParam(static_cast<TS &&>(params))...);
+        return targetSprintf(_formatBuff, static_cast<TS &&>(params)...);
     }
 
     // Format
     template <typename ... TS>
     int format(char const * fmt, TS && ... params) {
-        return buffsprintf(fmt, coerceToExpectedParam(static_cast<TS &&>(params))...);
+        return targetSprintf(fmt, static_cast<TS &&>(params)...);
     }
 
     // Write
     template <typename ... TS>
     int write(char const * sep, TS && ... params) {
         writeFormat(sep, "", sizeof...(params) - 1, static_cast<TS &&>(params)...);
-        return buffsprintf(_formatBuff, coerceToExpectedParam(static_cast<TS &&>(params))...);
+        return targetSprintf(_formatBuff, static_cast<TS &&>(params)...);
     }
 
 // Private utilities
@@ -139,7 +148,7 @@ private:
     }
 
     #define EXPECTED_TYPE(EXPECTED_TYPE, VALUE, RETURN_VALUE, FORMAT_CHAR) \
-    auto coerceToExpectedParam(EXPECTED_TYPE const & VALUE) { return RETURN_VALUE; } \
+    auto coerceToExpectedParam(EXPECTED_TYPE const & VALUE) -> decltype(RETURN_VALUE) { return RETURN_VALUE; } \
     char const * charForType(EXPECTED_TYPE) { return FORMAT_CHAR; }
     //
     EXPECTED_TYPE(             float, t,                            t, StringFmtFloat)
@@ -158,27 +167,17 @@ private:
     EXPECTED_TYPE(           int64_t, t,                            t, StringFmtIntLong)
     EXPECTED_TYPE(      char const *, t,                            t, StringFmtString)
 
-    int buffsprintf(char const *fmt, ...) {
-        _callbackBuffIndex = 0;
-        va_list va;
-        va_start(va, fmt);
-        int ret = stbsp_vsprintfcb(callback, (void *)this, _buff, fmt, va);
-        va_end(va);
-        callback("\0", (void *)this, 1);
+    template <typename ... TS>
+    int targetSprintf(char const *fmt, TS && ... params) {
+        int ret;
+        if (_targetIsSTD) {
+            ret = CHAR_STREAM_SPRINTF(_buff, fmt, coerceToExpectedParam(static_cast<TS &&>(params))...);
+            stdwrite(_target.value, _buff, ret);
+        }
+        else {
+            ret = CHAR_STREAM_SPRINTF(_target.str, fmt, coerceToExpectedParam(static_cast<TS &&>(params))...);
+        }
         return ret;
-    }
-
-    bool isTargetStd() const {
-        size_t t = _target.value;
-        return (
-            t == stdout ||
-            t == stdin  ||
-            t == stderr
-        );
-    }
-
-    char * callbackTargetStr() const  {
-        return _target.str + _callbackBuffIndex;
     }
 
 // Private static utilities
@@ -193,28 +192,13 @@ private:
         return i;
     }
 
-    static char * callback(char const * buf, void * user, int len) {
-        this_t & cs = *(reinterpret_cast<this_t *>(user));
-        int i = 0;
-        if (cs.isTargetStd()) {
-            i = stdwrite(cs._target.value, buf, len);
-        }
-        else {
-            i = scpy(cs.callbackTargetStr(), buf, len);
-            // write null byte, but don't include it in new index
-            scpy(cs.callbackTargetStr() + i, "\0", 1);
-        }
-        cs._callbackBuffIndex += i;
-        return cs._buff;
-    }
-
 // Instance storage
 private:
     Target _target;
+    bool _targetIsSTD;
     char const * _sep;
     char const * _trm;
-    size_t _callbackBuffIndex;
-    char _buff[STB_SPRINTF_MIN];
+    char _buff[CHAR_STREAM_BUFFER_SIZE];
     char _formatBuff[FormatBufferSize];
 
 };
@@ -254,7 +238,7 @@ private:
 #define CHAR_STREAM_OPERATOR(SIZE, COUNT, FORMAT, ...) operator char const * () { \
     static CharLoop<uint16_t, SIZE * COUNT> buff; \
     auto ret = buff.claim(SIZE); \
-    stbsp_sprintf(ret, FORMAT, __VA_ARGS__); \
+    CHAR_STREAM_SPRINTF(ret, FORMAT, __VA_ARGS__); \
     return ret.ptr(); \
 }
 
