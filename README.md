@@ -121,10 +121,10 @@ Ouput to `stdout`:
 
 
 ## Requirements
-- [stb_sprintf.h]: https://github.com/nothings/stb/blob/master/stb_sprintf.h
-- [<stdint.h>]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdint.h.html
-- [<unistd.h>]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/unistd.h.html "(macOS, *nix)"
-- [<io.h>]: https://docs.microsoft.com/en-us/cpp/c-runtime-library/low-level-i-o "(Windows)"
+
+- [`stb_sprintf.h`](https://github.com/nothings/stb/blob/master/stb_sprintf.h)
+- [`<stdint.h>`](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdint.h.html)
+- [`<unistd.h>` (macOS, *nix)](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/unistd.h.html) or [`<io.h>` (Windows)](https://docs.microsoft.com/en-us/cpp/c-runtime-library/low-level-i-o)
 
 
 
