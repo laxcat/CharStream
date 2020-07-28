@@ -13,6 +13,7 @@ struct IntPair {
 
 int main() {
     CharStream Log;
+    Log();
 
 
     // Standard types
