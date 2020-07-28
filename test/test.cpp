@@ -1,7 +1,7 @@
 #include "stb_sprintf.h"
 #define CHAR_STREAM_SPRINTF stbsp_sprintf
 #define CHAR_STREAM_ENABLE_OPERATOR_MACRO
-#include "CharStream.h"
+#include "../CharStream.h"
 
 
 struct IntPair {
