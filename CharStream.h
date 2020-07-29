@@ -6,17 +6,25 @@ For documentation refer to README.md in this directory or https://github.com/lax
 
 */
 
+
 #pragma once
 #include <stdint.h>
-
-#ifndef CHAR_STREAM_BUFFER_SIZE
-#define CHAR_STREAM_BUFFER_SIZE 512
-#endif
 
 #ifndef CHAR_STREAM_SPRINTF
 #define CHAR_STREAM_SPRINTF sprintf
 #endif
 
+#ifndef CHAR_STREAM_BUFFER_SIZE
+#define CHAR_STREAM_BUFFER_SIZE 512
+#endif
+
+#ifndef CHAR_STREAM_FORMAT_BUFFER_SIZE
+#define CHAR_STREAM_FORMAT_BUFFER_SIZE 128
+#endif
+
+#ifndef CHAR_STREAM_FORMAT_INDEX_TYPE
+#define CHAR_STREAM_FORMAT_INDEX_TYPE uint8_t
+#endif
 
 
 // WINDOWS (untested)
@@ -45,12 +53,6 @@ For documentation refer to README.md in this directory or https://github.com/lax
 
 
 class CharStream {
-// Private convenience declarations
-private:
-
-    using FI = uint8_t;
-    using this_t = CharStream;
-
 // Public declarations
 public:
 
@@ -63,8 +65,6 @@ public:
     static constexpr char const * StringFmtUintLong     = "ld";
     static constexpr char const * StringFmtInt          = "d";
     static constexpr char const * StringFmtIntLong      = "ld";
-
-    static constexpr FI FormatBufferSize = 255;
 
     union Target {
         char * str;
@@ -115,9 +115,14 @@ public:
 private:
 
     template <typename ... TS>
-    void writeFormat(char const * sep, char const * trm, FI paramCount, TS && ... params) {
-        FI fbuffIndex = 0;
-        FI paramIndex = 0;
+    void writeFormat(
+        char const * sep, 
+        char const * trm, 
+        CHAR_STREAM_FORMAT_INDEX_TYPE paramCount, 
+        TS && ... params) {
+
+        CHAR_STREAM_FORMAT_INDEX_TYPE fbuffIndex = 0;
+        CHAR_STREAM_FORMAT_INDEX_TYPE paramIndex = 0;
         (writeFormatItem(sep, trm, fbuffIndex, paramIndex, paramCount, params), ...);
     }
 
@@ -125,9 +130,9 @@ private:
     void writeFormatItem(
         char const * sep, 
         char const * trm, 
-        FI & fbuffIndex,
-        FI & paramIndex,
-        FI paramCount,
+        CHAR_STREAM_FORMAT_INDEX_TYPE & fbuffIndex,
+        CHAR_STREAM_FORMAT_INDEX_TYPE & paramIndex,
+        CHAR_STREAM_FORMAT_INDEX_TYPE paramCount,
         TS && param) {
 
         // write the format string
@@ -184,8 +189,12 @@ private:
 // Private static utilities
 private:
 
-    static size_t scpy(char * dst, char const * src, size_t max = (size_t)-1) {
-        size_t i = 0;
+    static CHAR_STREAM_FORMAT_INDEX_TYPE scpy(
+        char * dst, 
+        char const * src, 
+        CHAR_STREAM_FORMAT_INDEX_TYPE max = (CHAR_STREAM_FORMAT_INDEX_TYPE)-1) {
+        
+        CHAR_STREAM_FORMAT_INDEX_TYPE i = 0;
         for(; i < max; ++i) {
             dst[i] = src[i];
             if (dst[i] == '\0') break;
@@ -200,7 +209,7 @@ private:
     char const * _sep;
     char const * _trm;
     char _buff[CHAR_STREAM_BUFFER_SIZE];
-    char _formatBuff[FormatBufferSize];
+    char _formatBuff[CHAR_STREAM_FORMAT_BUFFER_SIZE];
 
 };
 

@@ -186,12 +186,24 @@ CHAR_STREAM_OPERATOR(SIZE, COUNT, FORMAT, ...)
 
 
 
-**CHAR_STREAM_BUFFER_SIZE**
-
-Size of internal buffer when writting to a standard output. Not read when writing directly to string buffer. Default 128.
-
-
-
 **CHAR_STREAM_SPRINTF**
 
 Name of `sprintf` function to use. Default `sprintf`.
+
+
+
+**CHAR_STREAM_BUFFER_SIZE**
+
+Size of internal buffer when writting to a standard output. Not relevent when writing directly to string buffer. Default 512.
+
+
+
+**CHAR_STREAM_FORMAT_BUFFER_SIZE**
+
+Size of automatically constructed format string buffer. Default 128.
+
+
+
+**CHAR_STREAM_FORMAT_INDEX_TYPE**
+
+Integer type used for all indexes and sizes refering to the automatically constructed format string buffer. Default `uint8_t`.
