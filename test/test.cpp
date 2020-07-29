@@ -1,4 +1,10 @@
+#define STB_SPRINTF_MIN 128
+#define STB_SPRINTF_NOFLOAT
+#define STB_SPRINTF_IMPLEMENTATION
 #include "stb_sprintf.h"
+
+#define CHAR_STREAM_BUFFER_SIZE STB_SPRINTF_MIN
+#define CHAR_STREAM_FORMAT_BUFFER_SIZE 64
 #define CHAR_STREAM_SPRINTF stbsp_sprintf
 #define CHAR_STREAM_ENABLE_OPERATOR_MACRO
 #include "../CharStream.h"
