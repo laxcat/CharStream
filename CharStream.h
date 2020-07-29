@@ -74,6 +74,7 @@ public:
         Target(char * str) : str(str) {}
         template <size_t N> Target(char (&str)[N]) : str((char *)str) {}
         template <typename T> Target(T * value) : ptr((void *)value) {}
+        friend bool operator ==(Target const & a, size_t b) { return a.value == b; }
     };
 
 
@@ -83,7 +84,7 @@ public:
     // Constructor
     CharStream(Target target = stdout, char const * sep = " ", char const * trm = "\n") : 
         _target(target), 
-        _targetIsSTD(_target.value == stdin || _target.value == stderr || _target.value == stdout), 
+        _targetIsSTD(_target == stdin || _target == stderr || _target == stdout), 
         _sep(sep), 
         _trm(trm) {}
 
