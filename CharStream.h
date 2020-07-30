@@ -26,29 +26,35 @@ For documentation refer to README.md in this directory or https://github.com/lax
 #define CHAR_STREAM_FORMAT_INDEX_TYPE uint8_t
 #endif
 
-
 // WINDOWS (untested)
-#ifdef _WIN32
-    #include <io.h>
-    #define stdwrite(DST, SRC, LEN) ::_write(DST, SRC, LEN)
+#ifndef CHAR_STREAM_DISABLE_SYS_INCLUDE
+    #ifdef _WIN32
+        #include <io.h>
+        #define CHAR_STREAM_SYSWRITE(DST, SRC, LEN) ::_write(DST, SRC, LEN)
 
-// MAC-OS (and other *nix platforms, untested)
+    // MAC-OS (and other *nix platforms, untested)
+    #else
+        #include <unistd.h>
+        #define CHAR_STREAM_SYSWRITE(DST, SRC, LEN) ::write(DST, SRC, LEN)
+
+        #ifndef stdin
+        #define stdin STDIN_FILENO
+        #endif
+
+        #ifndef stderr
+        #define stderr STDERR_FILENO
+        #endif
+
+        #ifndef stdout
+        #define stdout STDOUT_FILENO
+        #endif
+
+    #endif
+
 #else
-    #include <unistd.h>
-    #define stdwrite(DST, SRC, LEN) ::write(DST, SRC, LEN)
-
-    #ifndef stdin
-    #define stdin STDIN_FILENO
-    #endif
-
-    #ifndef stderr
-    #define stderr STDERR_FILENO
-    #endif
-
-    #ifndef stdout
-    #define stdout STDOUT_FILENO
-    #endif
-
+    #define stdin 0
+    #define stdout 1
+    #define stderr 2
 #endif
 
 
@@ -164,12 +170,16 @@ private:
     EXPECTED_TYPE(           uint8_t, t,                            t, StringFmtUint)
     EXPECTED_TYPE(          uint16_t, t,                            t, StringFmtUint)
     EXPECTED_TYPE(          uint32_t, t,                            t, StringFmtUint)
+    #ifndef CHAR_STREAM_DISABLE_LONG
     EXPECTED_TYPE(     unsigned long, t,                            t, StringFmtUintLong)
+    #endif
     EXPECTED_TYPE(          uint64_t, t,                            t, StringFmtUintLong)
     EXPECTED_TYPE(            int8_t, t,                            t, StringFmtInt)
     EXPECTED_TYPE(           int16_t, t,                            t, StringFmtInt)
     EXPECTED_TYPE(           int32_t, t,                            t, StringFmtInt)
+    #ifndef CHAR_STREAM_DISABLE_LONG
     EXPECTED_TYPE(              long, t,                            t, StringFmtIntLong)
+    #endif
     EXPECTED_TYPE(           int64_t, t,                            t, StringFmtIntLong)
     EXPECTED_TYPE(      char const *, t,                            t, StringFmtString)
 
@@ -177,8 +187,10 @@ private:
     int targetSprintf(char const *fmt, TS && ... params) {
         int ret;
         if (_targetIsSTD) {
+            #ifdef CHAR_STREAM_SYSWRITE
             ret = CHAR_STREAM_SPRINTF(_buff, fmt, coerceToExpectedParam(static_cast<TS &&>(params))...);
-            stdwrite(_target.value, _buff, ret);
+            CHAR_STREAM_SYSWRITE(_target.value, _buff, ret);
+            #endif
         }
         else {
             ret = CHAR_STREAM_SPRINTF(_target.str, fmt, coerceToExpectedParam(static_cast<TS &&>(params))...);

@@ -178,7 +178,7 @@ int write(char const * seperator, TS && ...);
 
 **CHAR_STREAM_OPERATOR**
 
-Macro function for conveniently adding a `char const *` operator to a custom class. `SIZE` is the number of characters needed for each instance's constructed output. `COUNT` is number instances of this custom-type that can be included as parameters of any one given call. (Each custom type using this macro will allocate a `SIZE * COUNT` byte char buffer for all instances to share.) `FORMAT` and the variadic parameters are used to construct the string.
+Macro function for conveniently adding a `char const *` operator to a custom class. `SIZE` is the number of characters needed for each instance's constructed output. `COUNT` is number instances of this custom-type that can be included as parameters of any one given call. (Each custom type using this macro will allocate a `SIZE * COUNT` byte char buffer for all instances to share.) `FORMAT` and the variadic parameters are used to construct the string. Not defined by default. Define `CHAR_STREAM_ENABLE_OPERATOR_MACRO` to enable.
 
 ```cpp
 CHAR_STREAM_OPERATOR(SIZE, COUNT, FORMAT, ...)
@@ -207,3 +207,16 @@ Size of automatically constructed format string buffer. Default 128.
 **CHAR_STREAM_FORMAT_INDEX_TYPE**
 
 Integer type used for all indexes and sizes refering to the automatically constructed format string buffer. Default `uint8_t`.
+
+
+
+**CHAR_STREAM_DISABLE_SYS_INCLUDE**
+
+Disables including system includes (`<io.h>` for Windows or `<uinistd.h>` for *nix). If a user defines this setting, data written to standard outputs will be sent to `CHAR_STREAM_SYSWRITE`, or ignored if `CHAR_STREAM_SYSWRITE` is not defined. This setting is not defined by default.
+
+
+
+**CHAR_STREAM_SYSWRITE(DST, SRC, LEN)**
+
+If `CHAR_STREAM_DISABLE_SYS_INCLUDE` is defined, optionally define this macro function to which all of a `CharStream`'s writes to the standard output will be sent. If not set, all writes to the standard output will be ignored. Will be ignored if `CHAR_STREAM_DISABLE_SYS_INCLUDE` is not defined.
+
