@@ -128,7 +128,7 @@ Ouput to `stdout`:
 
 
 
-## API
+## Documentation
 **Constructor** 
 
 `target` accepts a `char *`, `FILE *`, `size_t` (and others) reference to an output or string buffer. For each call operator call, `sep` is written between each parameter and `trm` is written after the last one.
