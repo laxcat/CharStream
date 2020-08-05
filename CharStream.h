@@ -26,8 +26,8 @@ For documentation refer to README.md in this directory or https://github.com/lax
 #define CHAR_STREAM_FORMAT_INDEX_TYPE uint8_t
 #endif
 
-// WINDOWS (untested)
 #ifndef CHAR_STREAM_DISABLE_SYS_INCLUDE
+    // WINDOWS (untested)
     #ifdef _WIN32
         #include <io.h>
         #define CHAR_STREAM_SYSWRITE(DST, SRC, LEN) ::_write(DST, SRC, LEN)
@@ -36,26 +36,9 @@ For documentation refer to README.md in this directory or https://github.com/lax
     #else
         #include <unistd.h>
         #define CHAR_STREAM_SYSWRITE(DST, SRC, LEN) ::write(DST, SRC, LEN)
-
-        #ifndef stdin
-        #define stdin STDIN_FILENO
-        #endif
-
-        #ifndef stderr
-        #define stderr STDERR_FILENO
-        #endif
-
-        #ifndef stdout
-        #define stdout STDOUT_FILENO
-        #endif
-
     #endif
-
-#else
-    #define stdin 0
-    #define stdout 1
-    #define stderr 2
 #endif
+
 
 
 class CharStream {
@@ -81,16 +64,20 @@ public:
         template <size_t N> Target(char (&str)[N]) : str((char *)str) {}
         template <typename T> Target(T * value) : ptr((void *)value) {}
         friend bool operator ==(Target const & a, size_t b) { return a.value == b; }
+        friend bool operator ==(Target const & a, void * b) { return a.ptr   == b; }
     };
 
+    static constexpr int In = 0;
+    static constexpr int Out = 1;
+    static constexpr int Err = 2;
 
 // Instance API
 public:
 
     // Constructor
-    CharStream(Target target = stdout, char const * sep = " ", char const * trm = "\n") : 
+    CharStream(Target target = Out, char const * sep = " ", char const * trm = "\n") : 
         _target(target), 
-        _targetIsSTD(_target == stdin || _target == stderr || _target == stdout), 
+        _targetIsSTD(_target == In || _target == Out || _target == Err), 
         _sep(sep), 
         _trm(trm) {}
 
